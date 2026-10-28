@@ -1,0 +1,112 @@
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "KeySystem"
+gui.ResetOnSpawn = false
+
+-- MENU PRINCIPAL
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 420, 0, 205)
+frame.Position = UDim2.new(0.5, -210, 0.5, -102)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BorderSizePixel = 0
+frame.Parent = gui
+
+Instance.new("UICorner", frame).CornerRadius =
+    UDim.new(0, 14)
+
+-- TITRE
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 55)
+title.BackgroundTransparency = 1
+title.Text = "KEY SYSTEM"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextSize = 30
+title.Font = Enum.Font.GothamBold
+title.Parent = frame
+
+-- BARRE POUR LA CLÉ
+local input = Instance.new("TextBox")
+input.Name = "KeyInput"
+input.Size = UDim2.new(0.88, 0, 0, 48)
+input.Position = UDim2.new(0.06, 0, 0, 60)
+input.BackgroundColor3 = Color3.fromRGB(43, 43, 43)
+input.TextColor3 = Color3.new(1, 1, 1)
+input.PlaceholderText = "Enter your key here..."
+input.PlaceholderColor3 = Color3.fromRGB(140, 140, 140)
+input.Text = ""
+input.TextSize = 18
+input.Font = Enum.Font.Gotham
+input.ClearTextOnFocus = false
+input.Parent = frame
+
+Instance.new("UICorner", input).CornerRadius =
+    UDim.new(0, 12)
+
+-- FONCTION POUR CRÉER LES BOUTONS
+local function makeButton(name, text, color, pos, size)
+    local button = Instance.new("TextButton")
+    button.Name = name
+    button.Text = text
+    button.Size = size
+    button.Position = pos
+    button.BackgroundColor3 = color
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.TextSize = 20
+    button.Font = Enum.Font.GothamBold
+    button.Parent = frame
+
+    Instance.new("UICorner", button).CornerRadius =
+        UDim.new(0, 12)
+
+    return button
+end
+
+-- BOUTON SUBMIT
+local submit = makeButton(
+    "Submit",
+    "SUBMIT",
+    Color3.fromRGB(0, 120, 215),
+    UDim2.new(0.06, 0, 0, 125),
+    UDim2.new(0.48, 0, 0, 52)
+)
+
+-- BOUTON GET KEY
+local getKey = makeButton(
+    "GetKey",
+    "GET KEY",
+    Color3.fromRGB(58, 58, 58),
+    UDim2.new(0.54, 0, 0, 125),
+    UDim2.new(0.40, 0, 0, 52)
+)
+
+-- MESSAGE
+local message = Instance.new("TextLabel")
+message.Size = UDim2.new(1, 0, 0, 22)
+message.Position = UDim2.new(0, 0, 1, -22)
+message.BackgroundTransparency = 1
+message.Text = ""
+message.TextColor3 = Color3.fromRGB(180, 180, 180)
+message.TextSize = 12
+message.Font = Enum.Font.Gotham
+message.Parent = frame
+
+-- ACTION SUBMIT
+submit.MouseButton1Click:Connect(function()
+    if input.Text == "" then
+        message.Text = "Enter your key first!"
+    else
+        message.Text = "Key validation not configured."
+    end
+end)
+
+-- ACTION GET KEY
+getKey.MouseButton1Click:Connect(function()
+    input.Text = "https://discord.gg/W8g44E5rX"
+    message.Text = "Discord link loaded!"
+end)
+
+-- AFFICHER LE MENU
+gui.Parent = player:WaitForChild("PlayerGui")
