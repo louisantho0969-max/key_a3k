@@ -1,154 +1,282 @@
-
 local Players = game:GetService("Players")
-local player = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
--- CONFIGURATION
+local player = Players.LocalPlayer
+local parent = player:WaitForChild("PlayerGui")
+
 local VALID_KEY = "VNX-2026-7K9X"
 local DISCORD_LINK = "https://discord.gg/W8g44E5rX"
 
--- INTERFACE
+-- Nettoyage
+for _, name in ipairs({"KeySystem", "PanelChargement"}) do
+    local old = parent:FindFirstChild(name)
+    if old then old:Destroy() end
+end
+
+-- KEY SYSTEM
 local gui = Instance.new("ScreenGui")
 gui.Name = "KeySystem"
 gui.ResetOnSpawn = false
-gui.IgnoreGuiInset = true
+gui.Parent = parent
 
--- MENU
 local frame = Instance.new("Frame")
-frame.Name = "MainFrame"
-frame.Size = UDim2.fromOffset(420, 205)
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.Size = UDim2.fromOffset(320, 185)
 frame.Position = UDim2.fromScale(0.5, 0.5)
-frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
 frame.BorderSizePixel = 0
 frame.Parent = gui
 
 Instance.new("UICorner", frame).CornerRadius =
-    UDim.new(0, 14)
+    UDim.new(0, 12)
 
--- TITRE
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 55)
+title.Size = UDim2.new(1, 0, 0, 40)
 title.BackgroundTransparency = 1
-title.Text = "KEY SYSTEM"
+title.Text = "A3K | KEY SYSTEM"
 title.TextColor3 = Color3.new(1, 1, 1)
-title.TextSize = 30
 title.Font = Enum.Font.GothamBold
+title.TextSize = 18
 title.Parent = frame
 
--- CASE DE CLÉ
 local input = Instance.new("TextBox")
-input.Name = "KeyInput"
-input.Size = UDim2.new(0.88, 0, 0, 48)
-input.Position = UDim2.new(0.06, 0, 0, 60)
-input.BackgroundColor3 = Color3.fromRGB(43, 43, 43)
+input.Size = UDim2.new(1, -30, 0, 38)
+input.Position = UDim2.fromOffset(15, 48)
+input.BackgroundColor3 = Color3.fromRGB(42, 42, 52)
 input.TextColor3 = Color3.new(1, 1, 1)
-input.PlaceholderText = "Enter your key here..."
-input.PlaceholderColor3 = Color3.fromRGB(140, 140, 140)
+input.PlaceholderText = "Enter your key..."
+input.PlaceholderColor3 = Color3.fromRGB(170, 170, 170)
 input.Text = ""
-input.TextSize = 18
-input.Font = Enum.Font.Gotham
 input.ClearTextOnFocus = false
-input.TextXAlignment = Enum.TextXAlignment.Center
+input.Font = Enum.Font.Gotham
+input.TextSize = 14
 input.Parent = frame
 
 Instance.new("UICorner", input).CornerRadius =
-    UDim.new(0, 12)
+    UDim.new(0, 7)
 
--- FONCTION BOUTONS
-local function makeButton(name, text, color, pos, size)
-    local button = Instance.new("TextButton")
-    button.Name = name
-    button.Text = text
-    button.Size = size
-    button.Position = pos
-    button.BackgroundColor3 = color
-    button.TextColor3 = Color3.new(1, 1, 1)
-    button.TextSize = 18
-    button.Font = Enum.Font.GothamBold
-    button.AutoButtonColor = true
-    button.Parent = frame
-
-    Instance.new("UICorner", button).CornerRadius =
-        UDim.new(0, 12)
-
-    return button
+local function makeButton(text, pos, size)
+    local b = Instance.new("TextButton")
+    b.Size = size
+    b.Position = pos
+    b.BackgroundColor3 = Color3.fromRGB(24, 95, 165)
+    b.TextColor3 = Color3.new(1, 1, 1)
+    b.Text = text
+    b.Font = Enum.Font.GothamBold
+    b.TextSize = 13
+    b.Parent = frame
+    Instance.new("UICorner", b).CornerRadius =
+        UDim.new(0, 7)
+    return b
 end
 
--- SUBMIT
 local submit = makeButton(
-    "Submit",
     "SUBMIT",
-    Color3.fromRGB(0, 120, 215),
-    UDim2.new(0.06, 0, 0, 125),
-    UDim2.new(0.42, 0, 0, 48)
+    UDim2.fromOffset(15, 98),
+    UDim2.new(0.5, -20, 0, 35)
 )
 
--- GET KEY
 local getKey = makeButton(
-    "GetKey",
     "GET KEY",
-    Color3.fromRGB(58, 58, 58),
-    UDim2.new(0.52, 0, 0, 125),
-    UDim2.new(0.42, 0, 0, 48)
+    UDim2.new(0.5, 5, 0, 98),
+    UDim2.new(0.5, -20, 0, 35)
 )
 
--- MESSAGE
-local message = Instance.new("TextLabel")
-message.Name = "Status"
-message.Size = UDim2.new(1, -20, 0, 20)
-message.Position = UDim2.new(0, 10, 1, -21)
-message.BackgroundTransparency = 1
-message.Text = ""
-message.TextColor3 = Color3.fromRGB(180, 180, 180)
-message.TextSize = 12
-message.Font = Enum.Font.Gotham
-message.Parent = frame
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(1, -20, 0, 28)
+status.Position = UDim2.fromOffset(10, 143)
+status.BackgroundTransparency = 1
+status.Text = "Enter your key"
+status.TextColor3 = Color3.fromRGB(180, 180, 190)
+status.Font = Enum.Font.Gotham
+status.TextSize = 12
+status.Parent = frame
 
--- GET KEY
 getKey.Activated:Connect(function()
     input.Text = DISCORD_LINK
-    input:CaptureFocus()
-    input.CursorPosition = #input.Text + 1
-
-    message.Text = "Discord link loaded!"
-    message.TextColor3 = Color3.fromRGB(180, 180, 180)
+    status.Text = "Key link copied into the box"
 end)
 
--- SUBMIT
+-- CHARGEMENT A3K
+local function showLoading()
+    local loading = Instance.new("ScreenGui")
+    loading.Name = "PanelChargement"
+    loading.ResetOnSpawn = false
+    loading.Parent = parent
+
+    local panel = Instance.new("Frame")
+    panel.Size = UDim2.fromOffset(320, 260)
+    panel.AnchorPoint = Vector2.new(0.5, 0.5)
+    panel.Position = UDim2.fromScale(0.5, 0.5)
+    panel.BackgroundColor3 = Color3.fromRGB(245, 248, 252)
+    panel.BorderSizePixel = 0
+    panel.Parent = loading
+
+    Instance.new("UICorner", panel).CornerRadius =
+        UDim.new(0, 14)
+
+    local stroke = Instance.new("UIStroke", panel)
+    stroke.Color = Color3.fromRGB(181, 212, 244)
+    stroke.Thickness = 1.5
+
+    -- Spinner
+    local spinner = Instance.new("Frame")
+    spinner.Size = UDim2.fromOffset(120, 120)
+    spinner.AnchorPoint = Vector2.new(0.5, 0)
+    spinner.Position = UDim2.new(0.5, 0, 0, 24)
+    spinner.BackgroundTransparency = 1
+    spinner.Parent = panel
+
+    local ring = Instance.new("Frame")
+    ring.Size = UDim2.fromOffset(112, 112)
+    ring.AnchorPoint = Vector2.new(0.5, 0.5)
+    ring.Position = UDim2.fromScale(0.5, 0.5)
+    ring.BackgroundTransparency = 1
+    ring.Parent = spinner
+
+    Instance.new("UICorner", ring).CornerRadius =
+        UDim.new(1, 0)
+
+    local ringStroke = Instance.new("UIStroke", ring)
+    ringStroke.Color = Color3.fromRGB(181, 212, 244)
+    ringStroke.Thickness = 2
+    ringStroke.Transparency = 0.5
+
+    local dots = {
+        {18, Color3.fromRGB(24,95,165), 0},
+        {16, Color3.fromRGB(55,138,221), 0},
+        {14, Color3.fromRGB(55,138,221), 0.2},
+        {12, Color3.fromRGB(133,183,235), 0.3},
+        {10, Color3.fromRGB(133,183,235), 0.5},
+        {8, Color3.fromRGB(181,212,244), 0.6},
+    }
+
+    for i, d in ipairs(dots) do
+        local a = math.rad((i - 1) * 60)
+        local dot = Instance.new("Frame")
+        dot.Size = UDim2.fromOffset(d[1], d[1])
+        dot.AnchorPoint = Vector2.new(0.5, 0.5)
+        dot.Position = UDim2.new(
+            0.5, math.sin(a) * 56,
+            0.5, -math.cos(a) * 56
+        )
+        dot.BackgroundColor3 = d[2]
+        dot.BackgroundTransparency = d[3]
+        dot.BorderSizePixel = 0
+        dot.Parent = spinner
+        Instance.new("UICorner", dot).CornerRadius =
+            UDim.new(1, 0)
+    end
+
+    local center = Instance.new("Frame")
+    center.Size = UDim2.fromOffset(44, 44)
+    center.AnchorPoint = Vector2.new(0.5, 0.5)
+    center.Position = UDim2.fromScale(0.5, 0.5)
+    center.BackgroundColor3 = Color3.fromRGB(24, 95, 165)
+    center.BorderSizePixel = 0
+    center.Parent = spinner
+    Instance.new("UICorner", center).CornerRadius =
+        UDim.new(1, 0)
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 0, 24)
+    label.Position = UDim2.new(0, 0, 0, 160)
+    label.BackgroundTransparency = 1
+    label.Font = Enum.Font.GothamMedium
+    label.TextSize = 16
+    label.TextColor3 = Color3.fromRGB(30, 41, 59)
+    label.Text = "Chargement en cours"
+    label.Parent = panel
+
+    local track = Instance.new("Frame")
+    track.Size = UDim2.fromOffset(240, 10)
+    track.AnchorPoint = Vector2.new(0.5, 0)
+    track.Position = UDim2.new(0.5, 0, 0, 200)
+    track.BackgroundColor3 = Color3.fromRGB(181, 212, 244)
+    track.BackgroundTransparency = 0.5
+    track.BorderSizePixel = 0
+    track.Parent = panel
+    Instance.new("UICorner", track).CornerRadius =
+        UDim.new(1, 0)
+
+    local fill = Instance.new("Frame")
+    fill.Size = UDim2.fromScale(0, 1)
+    fill.BackgroundColor3 = Color3.fromRGB(24, 95, 165)
+    fill.BorderSizePixel = 0
+    fill.Parent = track
+    Instance.new("UICorner", fill).CornerRadius =
+        UDim.new(1, 0)
+
+    local tag = Instance.new("TextLabel")
+    tag.Size = UDim2.new(1, 0, 0, 24)
+    tag.Position = UDim2.new(0, 0, 0, 224)
+    tag.BackgroundTransparency = 1
+    tag.Font = Enum.Font.GothamBold
+    tag.TextSize = 16
+    tag.TextColor3 = Color3.fromRGB(24, 95, 165)
+    tag.Text = "A3K"
+    tag.Parent = panel
+
+    -- Animations
+    local running = true
+
+    local conn = RunService.RenderStepped:Connect(function(dt)
+        if not running then return end
+        spinner.Rotation =
+            (spinner.Rotation + dt * 225) % 360
+    end)
+
+    task.spawn(function()
+        local startTime = os.clock()
+        local n = 0
+
+        local tween = TweenService:Create(
+            fill,
+            TweenInfo.new(15, Enum.EasingStyle.Linear),
+            {Size = UDim2.fromScale(1, 1)}
+        )
+        tween:Play()
+
+        while os.clock() - startTime < 15
+            and loading.Parent do
+            n = (n % 3) + 1
+            label.Text = "Chargement en cours"
+                .. string.rep(".", n)
+            task.wait(0.7)
+        end
+
+        running = false
+        conn:Disconnect()
+
+        if loading.Parent then
+            loading:Destroy()
+        end
+
+        -- Lancement du script après le chargement
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/louisantho0969-max/Kitk4t/refs/heads/main/Kitk4tt"))()
+    end)
+end
+
+-- VALIDATION
 local busy = false
 
 submit.Activated:Connect(function()
-    if busy then
-        return
-    end
+    if busy then return end
 
     local enteredKey = input.Text:match("^%s*(.-)%s*$")
 
     if enteredKey == VALID_KEY then
         busy = true
-
-        message.Text = "Key accepted!"
-        message.TextColor3 = Color3.fromRGB(70, 220, 120)
-
+        status.Text = "Key accepted!"
         submit.Active = false
         getKey.Active = false
 
-        task.wait(0.5)
-
-        if gui.Parent then
-            gui:Destroy()
-        end
-
-        print("KEY VALIDATED")
-
-        -- Emplacement réservé pour
-        -- le contenu autorisé du projet.
-
+        task.wait(0.3)
+        gui:Destroy()
+        showLoading()
     else
-        message.Text = "Invalid key!"
-        message.TextColor3 = Color3.fromRGB(255, 80, 80)
+        status.Text = "Invalid key!"
+        status.TextColor3 = Color3.fromRGB(255, 80, 80)
     end
 end)
-
--- AFFICHAGE
-gui.Parent = player:WaitForChild("PlayerGui")
