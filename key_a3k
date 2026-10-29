@@ -10,11 +10,14 @@ local DISCORD_LINK = "https://discord.gg/W8g44E5rX"
 local gui = Instance.new("ScreenGui")
 gui.Name = "KeySystem"
 gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
 
--- MENU PRINCIPAL
+-- MENU
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 420, 0, 205)
-frame.Position = UDim2.new(0.5, -210, 0.5, -102)
+frame.Name = "MainFrame"
+frame.Size = UDim2.fromOffset(420, 205)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.Position = UDim2.fromScale(0.5, 0.5)
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
 frame.Parent = gui
@@ -32,7 +35,7 @@ title.TextSize = 30
 title.Font = Enum.Font.GothamBold
 title.Parent = frame
 
--- BARRE DE CLÉ
+-- CASE DE CLÉ
 local input = Instance.new("TextBox")
 input.Name = "KeyInput"
 input.Size = UDim2.new(0.88, 0, 0, 48)
@@ -45,12 +48,13 @@ input.Text = ""
 input.TextSize = 18
 input.Font = Enum.Font.Gotham
 input.ClearTextOnFocus = false
+input.TextXAlignment = Enum.TextXAlignment.Center
 input.Parent = frame
 
 Instance.new("UICorner", input).CornerRadius =
     UDim.new(0, 12)
 
--- CRÉATION DES BOUTONS
+-- FONCTION BOUTONS
 local function makeButton(name, text, color, pos, size)
     local button = Instance.new("TextButton")
     button.Name = name
@@ -59,8 +63,9 @@ local function makeButton(name, text, color, pos, size)
     button.Position = pos
     button.BackgroundColor3 = color
     button.TextColor3 = Color3.new(1, 1, 1)
-    button.TextSize = 20
+    button.TextSize = 18
     button.Font = Enum.Font.GothamBold
+    button.AutoButtonColor = true
     button.Parent = frame
 
     Instance.new("UICorner", button).CornerRadius =
@@ -75,7 +80,7 @@ local submit = makeButton(
     "SUBMIT",
     Color3.fromRGB(0, 120, 215),
     UDim2.new(0.06, 0, 0, 125),
-    UDim2.new(0.48, 0, 0, 52)
+    UDim2.new(0.42, 0, 0, 48)
 )
 
 -- GET KEY
@@ -83,14 +88,15 @@ local getKey = makeButton(
     "GetKey",
     "GET KEY",
     Color3.fromRGB(58, 58, 58),
-    UDim2.new(0.54, 0, 0, 125),
-    UDim2.new(0.40, 0, 0, 52)
+    UDim2.new(0.52, 0, 0, 125),
+    UDim2.new(0.42, 0, 0, 48)
 )
 
 -- MESSAGE
 local message = Instance.new("TextLabel")
-message.Size = UDim2.new(1, 0, 0, 22)
-message.Position = UDim2.new(0, 0, 1, -22)
+message.Name = "Status"
+message.Size = UDim2.new(1, -20, 0, 20)
+message.Position = UDim2.new(0, 10, 1, -21)
 message.BackgroundTransparency = 1
 message.Text = ""
 message.TextColor3 = Color3.fromRGB(180, 180, 180)
@@ -98,22 +104,27 @@ message.TextSize = 12
 message.Font = Enum.Font.Gotham
 message.Parent = frame
 
--- GET KEY : CHARGER LE LIEN
-getKey.MouseButton1Click:Connect(function()
+-- GET KEY
+getKey.Activated:Connect(function()
     input.Text = DISCORD_LINK
+    input:CaptureFocus()
+    input.CursorPosition = #input.Text + 1
+
     message.Text = "Discord link loaded!"
     message.TextColor3 = Color3.fromRGB(180, 180, 180)
 end)
 
--- SUBMIT : VERIFIER LA CLÉ
+-- SUBMIT
 local busy = false
 
-submit.MouseButton1Click:Connect(function()
+submit.Activated:Connect(function()
     if busy then
         return
     end
 
-    if input.Text == VALID_KEY then
+    local enteredKey = input.Text:match("^%s*(.-)%s*$")
+
+    if enteredKey == VALID_KEY then
         busy = true
 
         message.Text = "Key accepted!"
@@ -124,14 +135,14 @@ submit.MouseButton1Click:Connect(function()
 
         task.wait(0.5)
 
-        -- FERMER LE MENU
-        gui:Destroy()
+        if gui.Parent then
+            gui:Destroy()
+        end
 
-        -- POINT DE DÉPART DU CONTENU
         print("KEY VALIDATED")
 
-        -- Démarrage du contenu autorisé
-        -- de ton propre projet ici.
+        -- Emplacement réservé pour
+        -- le contenu autorisé du projet.
 
     else
         message.Text = "Invalid key!"
@@ -139,5 +150,5 @@ submit.MouseButton1Click:Connect(function()
     end
 end)
 
--- AFFICHER L'INTERFACE
+-- AFFICHAGE
 gui.Parent = player:WaitForChild("PlayerGui")
