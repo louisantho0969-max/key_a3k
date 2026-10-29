@@ -2,6 +2,11 @@
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
+-- CONFIGURATION
+local VALID_KEY = "VNX-2026-7K9X"
+local DISCORD_LINK = "https://discord.gg/W8g44E5rX"
+
+-- INTERFACE
 local gui = Instance.new("ScreenGui")
 gui.Name = "KeySystem"
 gui.ResetOnSpawn = false
@@ -27,7 +32,7 @@ title.TextSize = 30
 title.Font = Enum.Font.GothamBold
 title.Parent = frame
 
--- BARRE POUR LA CLÉ
+-- BARRE DE CLÉ
 local input = Instance.new("TextBox")
 input.Name = "KeyInput"
 input.Size = UDim2.new(0.88, 0, 0, 48)
@@ -45,7 +50,7 @@ input.Parent = frame
 Instance.new("UICorner", input).CornerRadius =
     UDim.new(0, 12)
 
--- FONCTION POUR CRÉER LES BOUTONS
+-- CRÉATION DES BOUTONS
 local function makeButton(name, text, color, pos, size)
     local button = Instance.new("TextButton")
     button.Name = name
@@ -64,7 +69,7 @@ local function makeButton(name, text, color, pos, size)
     return button
 end
 
--- BOUTON SUBMIT
+-- SUBMIT
 local submit = makeButton(
     "Submit",
     "SUBMIT",
@@ -73,7 +78,7 @@ local submit = makeButton(
     UDim2.new(0.48, 0, 0, 52)
 )
 
--- BOUTON GET KEY
+-- GET KEY
 local getKey = makeButton(
     "GetKey",
     "GET KEY",
@@ -93,20 +98,46 @@ message.TextSize = 12
 message.Font = Enum.Font.Gotham
 message.Parent = frame
 
--- ACTION SUBMIT
+-- GET KEY : CHARGER LE LIEN
+getKey.MouseButton1Click:Connect(function()
+    input.Text = DISCORD_LINK
+    message.Text = "Discord link loaded!"
+    message.TextColor3 = Color3.fromRGB(180, 180, 180)
+end)
+
+-- SUBMIT : VERIFIER LA CLÉ
+local busy = false
+
 submit.MouseButton1Click:Connect(function()
-    if input.Text == "" then
-        message.Text = "Enter your key first!"
+    if busy then
+        return
+    end
+
+    if input.Text == VALID_KEY then
+        busy = true
+
+        message.Text = "Key accepted!"
+        message.TextColor3 = Color3.fromRGB(70, 220, 120)
+
+        submit.Active = false
+        getKey.Active = false
+
+        task.wait(0.5)
+
+        -- FERMER LE MENU
+        gui:Destroy()
+
+        -- POINT DE DÉPART DU CONTENU
+        print("KEY VALIDATED")
+
+        -- Démarrage du contenu autorisé
+        -- de ton propre projet ici.
+
     else
-        message.Text = "Key validation not configured."
+        message.Text = "Invalid key!"
+        message.TextColor3 = Color3.fromRGB(255, 80, 80)
     end
 end)
 
--- ACTION GET KEY
-getKey.MouseButton1Click:Connect(function()
-    input.Text = "https://discord.gg/W8g44E5rX"
-    message.Text = "Discord link loaded!"
-end)
-
--- AFFICHER LE MENU
+-- AFFICHER L'INTERFACE
 gui.Parent = player:WaitForChild("PlayerGui")
